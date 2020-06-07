@@ -35,6 +35,7 @@ def create_buggy():
      msg=""
      lsg=""
      violations=""
+     hmsg=""
      
      
      flag_color = request.form['flag_color']
@@ -63,9 +64,14 @@ def create_buggy():
     
     
      if not hamster_booster.isdigit():
-       msg = f"{hamster_booster} is not a number .Please try again.The error is in hamster booster"
-       return render_template("buggy-form.html",msg=msg,buggy=record)
-    
+       hmsg = f"{hamster_booster} is not a number .Please try again.The error is in hamster booster"
+       return render_template("buggy-form.html",msg=msg,buggy=record,hmsg=hmsg)
+      
+     else:
+       total_cost =int(hamster_booster) *5
+       print(total_cost)
+       hmsg = f"Total cost of buggy is {total_cost}"
+       return render_template("updated.html",hmsg=hmsg,buggy=record)
     
      
 
@@ -73,11 +79,13 @@ def create_buggy():
      try:
        with sql.connect(DATABASE_FILE) as con:
          cur = con.cursor()
-         cur.execute("UPDATE buggies set qty_wheels=? WHERE id=?", (qty_wheels, DEFAULT_BUGGY_ID))
-         cur.execute("UPDATE buggies set flag_color=? WHERE id=?", (flag_color, DEFAULT_BUGGY_ID))
-         cur.execute("UPDATE buggies set flag_color_secondary=? WHERE id=?", (flag_color_secondary, DEFAULT_BUGGY_ID))
-         cur.execute("UPDATE buggies set flag_pattern=? WHERE id=?", (flag_pattern, DEFAULT_BUGGY_ID))
-         cur.execute("UPDATE buggies set hamster_booster=? WHERE id=?", (hamster_booster, DEFAULT_BUGGY_ID))
+         cur.execute(
+           "UPDATE buggies set qty_wheels=? ,flag_color=?,flag_color_secondary=?,flag_pattern?,hamster_booster=?WHERE id=?",
+           (qty_wheels,flag_color,flag_color_secondary,flag_pattern,hamster_booster,DEFAULT_BUGGY_ID)
+         )
+       
+        
+        
          
          con.commit()
          msg += "Record successfully saved"
@@ -86,7 +94,7 @@ def create_buggy():
        msg += "error in update operation"
      finally:
        con.close()
-       return render_template("updated.html", msg = msg)
+       return render_template("updated.html", msg = msg,hsmg=hsmg)
 
 #------------------------------------------------------------
 # a page for displaying the buggy

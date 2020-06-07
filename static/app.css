@@ -10,16 +10,16 @@ body {
   color: #000000;
   background: repeating-linear-gradient(
     45deg,
-    #ffffee,
-    #ffffee 2em,
-    #eeeeee 2em,
-    #eeeeee 4em
+    #827b04,
+    #04827f 2em,
+    #720482 2em,
+     #6b9efa 4em
   );
 }
 .main-content {
   min-height:100vh;
   padding: 1em;
-  background: white;
+  background: blueviolet;
   margin: 0 0 0 3em;
 }
 h1 {
