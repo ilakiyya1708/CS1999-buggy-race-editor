@@ -22,24 +22,71 @@ def home():
 #------------------------------------------------------------
 @app.route('/new', methods = ['POST', 'GET'])
 def create_buggy():
+  con = sql.connect(DATABASE_FILE)
+  con.row_factory = sql.Row
+  cur = con.cursor()
+  cur.execute("SELECT * FROM buggies")
+  record = cur.fetchone()
+
   if request.method == 'GET':
-    return render_template("buggy-form.html")
+    
+    return render_template("buggy-form.html",buggy=record)
   elif request.method == 'POST':
-    msg=""
-    try:
-      qty_wheels = request.form['qty_wheels']
-      msg = f"qty_wheels={qty_wheels}" 
-      with sql.connect(DATABASE_FILE) as con:
-        cur = con.cursor()
-        cur.execute("UPDATE buggies set qty_wheels=? WHERE id=?", (qty_wheels, DEFAULT_BUGGY_ID))
-        con.commit()
-        msg = "Record successfully saved"
-    except:
-      con.rollback()
-      msg = "error in update operation"
-    finally:
-      con.close()
-      return render_template("updated.html", msg = msg)
+     msg=""
+     lsg=""
+     violations=""
+     
+     
+     flag_color = request.form['flag_color']
+     flag_color_secondary = request.form['flag_color_secondary']
+     flag_pattern = request.form['flag_pattern']
+
+     lsg = f"flag_color={flag_color}"
+     lsg = f"flag_color_secondary={flag_color_secondary}"
+     lsg = f"flag_pattern={flag_pattern}"
+     
+
+
+     qty_wheels = request.form['qty_wheels']
+     hamster_booster = request.form['hamster_booster']
+     
+     
+     if not qty_wheels.isdigit():
+       msg= f"{qty_wheels} is not a number.Please try again."
+       return render_template("buggy-form.html",msg=msg,buggy=record)
+     elif not int(qty_wheels)%2 ==0:
+       msg= f"{qty_wheels}is not an even number and violates the rules.Please input an even number!"
+       return render_template("updated.html",buggy=record,msg=msg)
+     elif int(qty_wheels)<2 ==0:
+       msg = f"{qty_wheels} is less than the minimum requirement for wheels.Please try again!"
+       return render_template("updated.html",msg=msg,buggy=record)
+    
+    
+     if not hamster_booster.isdigit():
+       msg = f"{hamster_booster} is not a number .Please try again.The error is in hamster booster"
+       return render_template("buggy-form.html",msg=msg,buggy=record)
+    
+    
+     
+
+     
+     try:
+       with sql.connect(DATABASE_FILE) as con:
+         cur = con.cursor()
+         cur.execute("UPDATE buggies set qty_wheels=? WHERE id=?", (qty_wheels, DEFAULT_BUGGY_ID))
+         cur.execute("UPDATE buggies set flag_color=? WHERE id=?", (flag_color, DEFAULT_BUGGY_ID))
+         cur.execute("UPDATE buggies set flag_color_secondary=? WHERE id=?", (flag_color_secondary, DEFAULT_BUGGY_ID))
+         cur.execute("UPDATE buggies set flag_pattern=? WHERE id=?", (flag_pattern, DEFAULT_BUGGY_ID))
+         cur.execute("UPDATE buggies set hamster_booster=? WHERE id=?", (hamster_booster, DEFAULT_BUGGY_ID))
+         
+         con.commit()
+         msg += "Record successfully saved"
+     except:
+       con.rollback()
+       msg += "error in update operation"
+     finally:
+       con.close()
+       return render_template("updated.html", msg = msg)
 
 #------------------------------------------------------------
 # a page for displaying the buggy
