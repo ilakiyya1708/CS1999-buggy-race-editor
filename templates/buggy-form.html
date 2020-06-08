@@ -4,7 +4,15 @@
 
 {% block content %}
 
-  <h1>Make buggy</h1>
+  <h1>
+    {% if buggy %}
+      Edit buggy#{{ buggy ['id']}}
+    {% else %}
+      Create buggy
+    {% endif %}
+
+
+  </h1>
    <p>
      {{lsg}}
    </p>
@@ -18,6 +26,11 @@
 
 
   <form action="/new" method="post">
+   
+    <input type="hidden" name="id" value="{{ buggy['id']}}"  />
+    
+
+
     <label for="qty_wheels">Number of wheels:</label>
     <input type="text" name="qty_wheels" value="{{buggy['qty_wheels']}}"  />
     <br> 
