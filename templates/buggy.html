@@ -5,6 +5,7 @@
   <h1>Buggy</h1>
 {% for buggy in buggies %}
   <table>
+    
    <tr>
      <td>ID:</td> <td> {{ buggy['id'] }} </td>
     </tr>
@@ -30,7 +31,12 @@
 
    </tr>
    <tr>
+     <br>
+
      <td colspan="2"> <a href="/edit/{{ buggy['id'] }}" > edit me </a></td>
+     <br>
+     <td colspan="2"> <a  href="/delete/{{ buggy['id'] }}">delete me</td>
+     <br>
    </tr>
     
   </table>

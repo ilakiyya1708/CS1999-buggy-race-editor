@@ -22,6 +22,7 @@ def home():
 #------------------------------------------------------------
 @app.route('/new', methods = ['POST', 'GET'])
 def create_buggy():
+  print("Now creating a buggy")
   con = sql.connect(DATABASE_FILE)
   con.row_factory = sql.Row
   cur = con.cursor()
@@ -29,9 +30,11 @@ def create_buggy():
   record = cur.fetchone()
 
   if request.method == 'GET':
+    print("Why are you IN HERE")
     
     return render_template("buggy-form.html",buggy=None)
   elif request.method == 'POST':
+     print("Are u in here ?")
      msg=""
      lsg=""
      violations=""
@@ -117,7 +120,7 @@ def edit_buggy(buggy_id):
   con.row_factory = sql.Row
   cur = con.cursor()
   cur.execute("SELECT * FROM buggies WHERE id=?", (buggy_id,))
-  record = cur.fetchone();
+  record = cur.fetchone() ;
   return render_template("buggy-form.html",buggy=record)
 
 
@@ -146,13 +149,14 @@ def summary():
 #   there always being a record to update (because the
 #   student needs to change that!)
 #------------------------------------------------------------
-@app.route('/delete', methods = ['POST'])
-def delete_buggy():
+@app.route('/delete/<buggy_id>', methods = ['GET'])
+def delete_buggy(buggy_id):
   try:
     msg = "deleting buggy"
     with sql.connect(DATABASE_FILE) as con:
       cur = con.cursor()
-      cur.execute("DELETE FROM buggies")
+      cur.execute("DELETE FROM buggies WHERE id=?",(buggy_id,))
+      record = cur.fetchone()
       con.commit()
       msg = "Buggy deleted"
   except:
@@ -160,7 +164,7 @@ def delete_buggy():
     msg = "error in delete operation"
   finally:
     con.close()
-    return render_template("updated.html", msg = msg)
+    return render_template("updated.html", msg = msg,buggy=record)
 
 
 if __name__ == '__main__':
