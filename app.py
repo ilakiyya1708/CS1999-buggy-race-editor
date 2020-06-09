@@ -171,7 +171,7 @@ def delete_buggy(buggy_id):
     msg = "error in delete operation"
   finally:
     con.close()
-    return render_template("delete.html", msg = msg,buggy=record)
+    return render_template("updated.html", msg = msg,buggy=record)
 
 
 if __name__ == '__main__':
