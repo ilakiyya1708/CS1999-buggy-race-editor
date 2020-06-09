@@ -41,6 +41,7 @@ def create_buggy():
      hmsg=""
      
      
+     
      flag_color = request.form['flag_color']
      flag_color_secondary = request.form['flag_color_secondary']
      flag_pattern = request.form['flag_pattern']
@@ -130,26 +131,32 @@ def edit_buggy(buggy_id):
 #   using it because we'll be dipping diectly into the
 #   database
 #------------------------------------------------------------
-@app.route('/json')
-def summary():
+@app.route('/json/<buggy_id>')
+def summary(buggy_id):
   con = sql.connect(DATABASE_FILE)
   con.row_factory = sql.Row
   cur = con.cursor()
-  cur.execute("SELECT * FROM buggies WHERE id=? LIMIT 1", (DEFAULT_BUGGY_ID))
-  return jsonify(
-      {k: v for k, v in dict(zip(
-        [column[0] for column in cur.description], cur.fetchone())).items()
-        if (v != "" and v is not None)
-      }
-    )
+  cur.execute("SELECT * FROM buggies WHERE id=? LIMIT 1", (buggy_id))
+  record = cur.fetchone()
+  json_info = f"Can't access data for this buggy . It has been deleted"
+  if record is not None:
+
+    return jsonify(
+        {k: v for k, v in dict(zip(
+          [column[0] for column in cur.description], record)).items()
+         if (v != "" and v is not None)
+        }
+     )
+  else:
+    return render_template("updated.html",json_info=json_info,buggy=record)
 
 #------------------------------------------------------------
 # delete the buggy
 #   don't want DELETE here, because we're anticipating
 #   there always being a record to update (because the
-#   student needs to change that!)
+#   student needs to change that!)  
 #------------------------------------------------------------
-@app.route('/delete/<buggy_id>', methods = ['GET'])
+@app.route('/delete/<buggy_id>', methods = ['POST'])
 def delete_buggy(buggy_id):
   try:
     msg = "deleting buggy"
@@ -164,7 +171,7 @@ def delete_buggy(buggy_id):
     msg = "error in delete operation"
   finally:
     con.close()
-    return render_template("updated.html", msg = msg,buggy=record)
+    return render_template("delete.html", msg = msg,buggy=record)
 
 
 if __name__ == '__main__':
